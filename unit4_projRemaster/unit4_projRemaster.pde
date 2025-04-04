@@ -100,7 +100,7 @@ void stars(float amount)
 
 void drawHouse(int houseX, int houseY) 
 {  
-    // Random elements
+    // random
     color roofColor = color(random(100, 255), random(50, 150), random(50, 150));
     color wallColor = color(random(180, 220), random(120, 170), random(80, 130));
     color doorColor = color(random(80, 130), random(40, 90), random(0, 50));
@@ -110,13 +110,27 @@ void drawHouse(int houseX, int houseY)
     fill(wallColor);
     rect(houseX, houseY, 40, 40);
     
+    for (int y = houseY; y < houseY + 38; y += 2) 
+    {
+      for (int x = houseX; x < houseX + 35; x += 3) 
+      {
+        int r = int(random(0, 8));
+        if (r == 1)
+        {
+          color brickColor = color(random(170, 210), random(80, 100), random(5, 10));
+          fill(brickColor);
+          rect(x, y, 5, 3);
+        }
+      }
+    }
+    
     fill(roofColor);
     triangle(houseX, houseY, houseX + 40, houseY, houseX + 20, houseY - roofHeight);
     
     fill(doorColor);
     rect(houseX + 25, houseY + 22, 10, 15);
     fill(0);
-    ellipse(houseX + 27, houseY + 32, 3, 3); // door knob
+    ellipse(houseX + 27, houseY + 32, 3, 3); 
     
     fill(windowColor);
     rect(houseX + 5, houseY + 10, 10, 10);
@@ -128,39 +142,49 @@ void drawHouse(int houseX, int houseY)
     line(houseX + 30, houseY + 10, houseX + 30, houseY + 20);
     line(houseX + 25, houseY + 15, houseX + 35, houseY + 15);
     
-    noStroke();
-  
+    noStroke();  
 }
 
 void drawTree(int treeX, int treeY) 
 {  
-    //colors
+    // Colors
     color trunkColor = color(random(80, 130), random(40, 90), random(0, 50));
     color leavesColor = color(random(30, 100), random(100, 200), random(30, 100));
     
-    //trunk 
-    fill(trunkColor);
-    rect(treeX + 5, treeY + 10, 6, 10);
+    int size = int(random(2, 12));
+    for(int i = 0; i < size; i++) 
+    {
+      fill(trunkColor);
+      rect(treeX + 5, treeY - i * 3, 6, 3); 
+    }
     
-    //leaves 
+    // Leaves
     fill(leavesColor);
-    ellipse(treeX + 8, treeY, 16, 12);
-    ellipse(treeX, treeY + 2, 14, 10);
-    ellipse(treeX + 16, treeY + 2, 14, 10);
+    ellipse(treeX + 8, treeY - size * 3, 16, 12); 
+    ellipse(treeX, treeY - size * 3 + 2, 14, 10);
+    ellipse(treeX + 16, treeY - size * 3 + 2, 14, 10);
 }
 
 void drawStar(int starX, int starY) 
 {
-    fill(255); // White color
+    fill(255); 
     noStroke();
     
-    // Draw cross-like star (center + four small arms)
-    rect(starX + 3, starY, 2, 8); // Vertical line
-    rect(starX, starY + 3, 8, 2); // Horizontal line
+    int numStars = int(random(3, 7)); 
     
-    // Optional: Add tiny diagonal dots for a sharper look
-    rect(starX + 1, starY + 1, 2, 2);
-    rect(starX + 5, starY + 1, 2, 2);
-    rect(starX + 1, starY + 5, 2, 2);
-    rect(starX + 5, starY + 5, 2, 2);
+    for (int i = 0; i < numStars; i++) 
+    {
+        int sX = int(random(-10, 10));
+        int sY = int(random(-10, 10));
+        
+        int x = starX + sX;
+        int y = starY + sY;
+
+        rect(x + 3, y, 2, 8); 
+        rect(x, y + 3, 8, 2);      
+        rect(x + 1, y + 1, 2, 2);
+        rect(x + 5, y + 1, 2, 2);
+        rect(x + 1, y + 5, 2, 2);
+        rect(x + 5, y + 5, 2, 2);
+    }
 }

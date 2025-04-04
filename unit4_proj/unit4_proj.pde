@@ -1,13 +1,13 @@
 // Modes -----
-boolean brush = false; //works
+boolean brush = true; //works
 boolean lined = false; //works
-boolean circle = false;
 boolean rectangle = false;
-boolean stamp = true; //works
-boolean getColor = false;
+boolean stamp = false; //works
 
 boolean drawingLine = false;
+boolean drawingRect = false;
 int startX, startY;
+float currentColorR, currentColorG, currentColorB;
 
 // Colors
 color currentColor = 200;
@@ -15,6 +15,9 @@ float currentSize = 1;
 
 // Slider
 float posx = 30;
+float posyR = 780;
+float posyG = 780;
+float posyB = 780;
 
 void setup()
 {
@@ -23,14 +26,16 @@ void setup()
 }
 
 void draw()
-{
+{  
+  currentColor = color(int(currentColorR), int(currentColorG), int(currentColorB));
+  
+  // Draw the UI layout
+  layout();
+  
   stroke(0);
   strokeWeight(2);
   fill(currentColor);
   rect(115, 750, 40, 40, 5);
-  
-  // Draw the UI layout
-  layout();
 }
 
 void layout()
@@ -43,7 +48,11 @@ void layout()
   fill(110);
   rect(-4, 740, 175, 800, 10);
   fill(120);
-  rect(-4, 550, 100, 800, 10);  
+  rect(-4, 550, 110, 800, 10);  
+  fill(120);
+  rect(115, 685, 70, 32, 5);
+  rect(115, 643, 70, 32, 5);
+  rect(115, 601, 70, 32, 5);//
   stroke(110);
   strokeWeight(6);
   // Big line
@@ -55,6 +64,21 @@ void layout()
   line(20, 80, 180, 80);
   line(20, 160, 180, 160);
   line(20, 240, 180, 240);
+  //Texts
+  textSize(20);
+  textAlign(CENTER, CENTER);
+  fill(70);
+  text("DRAW", 60, 120);
+  text("LINE", 140, 120);
+  text("STAMP", 60, 200);
+  text("RECT", 140, 200);
+  textSize(30);
+  text("SIZE", 100, 380);
+  textSize(25);
+  text("COLOR", 50, 575);
+  text("CLEAR", 150, 700);
+  text("SAVE", 150, 658);
+  text("LOAD", 150, 617);
   
   // Size Slider
   stroke(80);
@@ -62,6 +86,27 @@ void layout()
   noStroke();
   fill(200);
   circle(posx, 420, 20);
+  
+  //Red Slider
+  stroke(80);
+  line(20, 600, 20, 780);
+  noStroke();
+  fill(200);
+  circle(20, posyR, 20);
+  
+  //Green Slider
+  stroke(80);
+  line(50, 600, 50, 780);
+  noStroke();
+  fill(200);
+  circle(50, posyG, 20);
+  
+  //Blue Slider
+  stroke(80);
+  line(80, 600, 80, 780);
+  noStroke();
+  fill(200);
+  circle(80, posyB, 20);
 }
 
 void mouseDragged()
@@ -73,7 +118,22 @@ void mouseDragged()
     {
       posx = mouseX;
     }
+    if(mouseX > 10 && mouseX < 30 && mouseY > 595 && mouseY < 785)
+    {
+      posyR = mouseY;
+    }
+    if(mouseX > 40 && mouseX < 60 && mouseY > 595 && mouseY < 785)
+    {
+      posyG = mouseY;
+    }
+    if(mouseX > 70 && mouseX < 90 && mouseY > 595 && mouseY < 785)
+    {
+      posyB = mouseY;
+    }
     currentSize = map(posx, 30, 170, 1, 90);
+    currentColorR = map(posyR, 785, 595, 0, 255);
+    currentColorG = map(posyG, 785, 595, 0, 255);
+    currentColorB = map(posyB, 785, 595, 0, 255);
   } 
   else 
   {
@@ -81,31 +141,86 @@ void mouseDragged()
     {
       paint();
     }
-    if (stamp) {
+    if (stamp) 
+    {
       stampDraw(mouseX, mouseY);
     }
   }
 }
 
-void mousePressed() {
-  if (mouseX > 197) { 
-    if (lined) {
+void mousePressed() 
+{
+  if (mouseX > 0 && mouseX < 100 && mouseY > 80 && mouseY < 160) 
+  {
+    clearAllTools();
+    brush = true;
+  }
+  else if (mouseX > 0 && mouseX < 100 && mouseY > 160 && mouseY < 240) 
+  {
+    clearAllTools();
+    stamp = true;
+  }
+  else if (mouseX > 100 && mouseX < 180 && mouseY > 80 && mouseY < 160) 
+  {
+    clearAllTools();
+    lined = true;
+  }
+  else if (mouseX > 100 && mouseX < 180 && mouseY > 160 && mouseY < 240) 
+  {
+    clearAllTools();
+    rectangle = true;
+  }
+  else if (mouseX > 115 && mouseX < 185 && mouseY > 685 && mouseY < 717) 
+  {
+    Clear();
+  }
+  else if (mouseX > 115 && mouseX < 185 && mouseY > 643 && mouseY < 675) 
+  {
+    selectOutput("Save an image", "saveImage");
+  }
+  else if (mouseX > 115 && mouseX < 185 && mouseY > 601 && mouseY < 633) 
+  {
+    selectOutput("Load an image", "openImage");
+  }
+  
+  if (mouseX > 197) 
+  { 
+    if (lined) 
+    {
       startX = mouseX;
       startY = mouseY;
       drawingLine = true;
     }
-    if (stamp) {
+    else if (rectangle) 
+    {
+      startX = mouseX;
+      startY = mouseY;
+      drawingRect = true;
+    }
+    else if (stamp) 
+    {
       stampDraw(mouseX, mouseY);
     }
   }
 }
 
-void mouseReleased() {
-  if (drawingLine) {
+void mouseReleased() 
+{
+  if (drawingLine) 
+  {
     strokeWeight(currentSize);
     stroke(currentColor);
     line(startX, startY, mouseX, mouseY);
     drawingLine = false;
+  }
+  if (drawingRect) 
+  {
+    strokeWeight(currentSize);
+    stroke(currentColor);
+    int sizeX = mouseX-startX;
+    int sizeY = mouseY-startY;
+    rect(startX, startY, sizeX, sizeY);
+    drawingRect = false;
   }
 }
 
@@ -116,35 +231,58 @@ void paint()
   line(pmouseX, pmouseY, mouseX, mouseY);
 }
 
-void stampDraw(int x, int y)
+void stampDraw(int x, int y) {
+  noStroke();  
+  // House
+  fill(180, 100, 50);
+  rect(x - currentSize * 10, y - currentSize * 7, currentSize * 20, currentSize * 14);  
+  // Roof
+  fill(150, 50, 30);
+  triangle(x - currentSize * 10, y - currentSize * 7, x + currentSize * 10, y - currentSize * 7, x, y - currentSize * 14); 
+  // Door
+  fill(100, 50, 20);
+  rect(x - currentSize * 2, y + currentSize * 3, currentSize * 4, currentSize * 6);
+  
+  // Windows
+  fill(100, 150, 255);
+  rect(x - currentSize * 6, y - currentSize, currentSize * 4, currentSize * 4); // Left window
+  rect(x + currentSize * 2, y - currentSize, currentSize * 4, currentSize * 4); // Right window  
+}
+
+void clearAllTools()
+{
+  brush = false; //works
+  lined = false; //works
+  rectangle = false;
+  stamp = false; //works
+}
+
+void Clear()
 {
   noStroke();
-  float houseWidth = currentSize*5;
-  float houseHeight = currentSize*3.3;
-  float roofHeight = currentSize*2.5;
-  float doorWidth = currentSize*0.4;
-  float doorHeight = currentSize*1;
-  float windowSize = currentSize*1;
-  
-  fill(180, 100, 50); 
-  rect(x - houseWidth / 2, y - houseHeight / 2, houseWidth, houseHeight);
-  
-  fill(150, 50, 30);
-  triangle(x - houseWidth / 2, y - houseHeight / 2, 
-           x + houseWidth / 2, y - houseHeight / 2, 
-           x, y - houseHeight / 2 - roofHeight);
+  fill(255);
+  rect(0,0,1400,800);
+}
 
-  fill(100, 50, 20);
-  rect(x - doorWidth / 2, y + houseHeight / 2 - doorHeight, doorWidth, doorHeight);
-  
-  
-  fill(100, 150, 255); 
-  rect(x - houseWidth / 3 - windowSize / 2, y - houseHeight / 3, windowSize, windowSize);
-  rect(x + houseWidth / 3 - windowSize / 2, y - houseHeight / 3, windowSize, windowSize);
+void saveImage(File f) 
+{
+    if (f != null) 
+    {
+        PImage canvas = get(200, 1, width, height);
+        canvas.save(f.getAbsolutePath());
+    }
+}
 
-  line(x - houseWidth / 3, y - houseHeight / 3, x - houseWidth / 3, y - houseHeight / 3 + windowSize);
-  line(x - houseWidth / 3 - windowSize / 2, y - houseHeight / 3 + windowSize / 2, x - houseWidth / 3 + windowSize / 2, y - houseHeight / 3 + windowSize / 2);
-  
-  line(x + houseWidth / 3, y - houseHeight / 3, x + houseWidth / 3, y - houseHeight / 3 + windowSize);
-  line(x + houseWidth / 3 - windowSize / 2, y - houseHeight / 3 + windowSize / 2, x + houseWidth / 3 + windowSize / 2, y - houseHeight / 3 + windowSize / 2);
+void openImage(File f) 
+{
+    if (f != null) 
+    {
+        int n = 0;
+        while (n < 100) 
+        {
+            PImage pic = loadImage(f.getPath());
+            image(pic, 200, 0);
+            n = n + 1;
+        }
+    }
 }
